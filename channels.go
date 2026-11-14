@@ -238,3 +238,30 @@ func (c *Client) GetUsersInConversation(channelID string) ([]string, error) {
 
 	return members, err
 }
+
+func (c *Client) UpdateChannel(channelID, name string) {
+	if channelID == "" || name == "" {
+		return
+	}
+
+	c.Lock()
+	c.channels[channelID] = "#" + strings.TrimPrefix(name, "#")
+	c.Unlock()
+}
+
+func (c *Client) RemoveChannel(channelID string) {
+	if channelID == "" {
+		return
+	}
+
+	c.Lock()
+	delete(c.channels, channelID)
+	c.Unlock()
+}
+
+func (c *Client) GetChannelCount() int {
+	c.RLock()
+	defer c.RUnlock()
+
+	return len(c.channels)
+}
